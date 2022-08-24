@@ -148,7 +148,7 @@ func TestTools_UploadOneFile(t *testing.T) {
 
 	var testTools Tools
 
-	uploadedFile, err := testTools.UploadOneFile(request, "./testdata/uploads", true)
+	uploadedFile, err := testTools.UploadOneFile(request, "./testdata/uploads")
 	if err != nil {
 		t.Error("error uploading files", err)
 	}
