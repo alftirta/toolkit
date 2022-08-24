@@ -42,7 +42,12 @@ type UploadedFile struct {
 	FileSize         int64
 }
 
-// UploadFiles uploads 1 or more files and returns the uploaded file information and potentially an error.
+// UploadFiles uploads one or more files to a specified directory,
+// and gives the files a random name.
+// It returns a slice containing the newly named files, the original file names,
+// the size of the files, and potentially an error.
+// If the optional last parameter is set to true, then we will not rename the files,
+// but will use the original file names.
 func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) ([]*UploadedFile, error) {
 	renameFile := true
 	if len(rename) > 0 {
