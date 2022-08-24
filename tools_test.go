@@ -111,3 +111,54 @@ func TestTools_UploadFiles(t *testing.T) {
 		wg.Wait()
 	}
 }
+
+func TestTools_UploadOneFile(t *testing.T) {
+	// set up a pipe to avoid buffering
+	pr, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
+
+	go func() {
+		defer writer.Close()
+
+		// create the form data field, let's say "pngFile"
+		pngFileWriter, err := writer.CreateFormFile("pngFile", "./testdata/img.png")
+		if err != nil {
+			t.Error("error creating form file", err)
+		}
+
+		pngFileReader, err := os.Open("./testdata/img.png")
+		if err != nil {
+			t.Error("error opening img.png file", err)
+		}
+		defer pngFileReader.Close()
+
+		img, _, err := image.Decode(pngFileReader)
+		if err != nil {
+			t.Error("error decoding image", err)
+		}
+
+		if err = png.Encode(pngFileWriter, img); err != nil {
+			t.Error("error encoding png")
+		}
+	}()
+
+	// read from the pipe which receives data
+	request := httptest.NewRequest("POST", "/", pr)
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+
+	var testTools Tools
+
+	uploadedFile, err := testTools.UploadOneFile(request, "./testdata/uploads", true)
+	if err != nil {
+		t.Error("error uploading files", err)
+	}
+
+	if _, err = os.Stat(fmt.Sprintf("./testdata/uploads/%s", uploadedFile.NewFileName)); os.IsNotExist(err) {
+		t.Errorf("expected file to exist: %s", err.Error())
+	}
+
+	// clean up
+	if err = os.Remove(fmt.Sprintf("./testdata/uploads/%s", uploadedFile.NewFileName)); err != nil {
+		t.Error("error removing file", err)
+	}
+}
