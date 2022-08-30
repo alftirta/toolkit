@@ -167,16 +167,16 @@ func TestTools_CreateDirIfNotExist(t *testing.T) {
 	var testTool Tools
 
 	// test when the directory does not exist
-	if err := testTool.CreateDirIfNotExist("toolkit/testdata/testdir"); err != nil {
+	if err := testTool.CreateDirIfNotExist("./testdata/testdir"); err != nil {
 		t.Error(err)
 	}
 
 	// test when the directory does exist
-	if err := testTool.CreateDirIfNotExist("toolkit/testdata/testdir"); err != nil {
+	if err := testTool.CreateDirIfNotExist("./testdata/testdir"); err != nil {
 		t.Error(err)
 	}
 
-	if err := os.Remove("toolkit/testdata/testdir"); err != nil {
+	if err := os.Remove("./testdata/testdir"); err != nil {
 		t.Error(err)
 	}
 }
