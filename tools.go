@@ -17,8 +17,10 @@ const randomStringSource string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRS
 // Tools is the type used to instantiate this module.
 // Any variable of this type will have access too all the methods with the receiver *Tools.
 type Tools struct {
-	MaxFileSize      int64
-	AllowedFileTypes []string
+	MaxFileSize        int64
+	AllowedFileTypes   []string
+	MaxJSONSize        int
+	AllowUnknownFields bool
 }
 
 // RandomString returns a string of random characters of length n,
