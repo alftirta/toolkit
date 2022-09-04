@@ -201,7 +201,7 @@ type JSONResponse struct {
 	Data    any    `json:"data,omitempty"`
 }
 
-// ReadJSON reads json data.
+// ReadJSON tries to read the body of a request and converts from json into a go data variable.
 func (t *Tools) ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {
 	var maxBytes int64 = 1024 * 1024 // 1MB
 	if t.MaxJSONSize != 0 {
