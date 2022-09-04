@@ -2,6 +2,7 @@ package toolkit
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -19,7 +20,7 @@ const randomStringSource string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRS
 type Tools struct {
 	MaxFileSize        int64
 	AllowedFileTypes   []string
-	MaxJSONSize        int
+	MaxJSONSize        int64
 	AllowUnknownFields bool
 }
 
@@ -198,4 +199,29 @@ type JSONResponse struct {
 	Error   bool   `json:"error"`
 	Message string `json:"message"`
 	Data    any    `json:"data,omitempty"`
+}
+
+// ReadJSON reads json data.
+func (t *Tools) ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {
+	var maxBytes int64 = 1024 * 1024 // 1MB
+	if t.MaxJSONSize != 0 {
+		maxBytes = t.MaxJSONSize
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
+	dec := json.NewDecoder(r.Body)
+
+	if !t.AllowUnknownFields {
+		dec.DisallowUnknownFields()
+	}
+
+	if err := dec.Decode(data); err != nil {
+		return err
+	}
+
+	if err := dec.Decode(&struct{}{}); err != io.EOF {
+		return errors.New("body must contain only one JSON value")
+	}
+
+	return nil
 }
