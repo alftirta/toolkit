@@ -7,6 +7,7 @@ import (
 	"image/png"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"net/http/httptest"
 	"os"
 	"sync"
@@ -371,5 +372,23 @@ func TestTools_ReadJSON(t *testing.T) {
 		if !test.errorExpected && err != nil {
 			t.Errorf("%s: error not expected, but one received: %s", test.name, err.Error())
 		}
+	}
+}
+
+func TestTools_WriteJSON(t *testing.T) {
+	var testTools Tools
+
+	rr := httptest.NewRecorder()
+
+	payload := JSONResponse{
+		Error:   false,
+		Message: "foo",
+	}
+
+	headers := make(http.Header)
+	headers.Add("FOO", "BAR")
+
+	if err := testTools.WriteJSON(rr, http.StatusOK, payload, headers); err != nil {
+		t.Errorf("failed to write JSON: %v", err)
 	}
 }
